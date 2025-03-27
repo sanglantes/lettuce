@@ -286,8 +286,8 @@ int main(int argc, char* argv[]) {
         puts("Options:");
         printf("\t-v\tEnable verbose mode (default: 0).\n");
         printf("\t-b x1,y1,x2,y2\n\t\tSet basis vectors.\n");
-        printf("\t-c C\tSet grid size of lattice points to draw.\n");
-        printf("\t-z Z\tSet positive zoom factor.\n");
+        printf("\t-c C\tSet grid size of lattice points to draw (default: 30)\n");
+        printf("\t-z Z\tSet positive zoom factor (default: 1).\n");
         printf("\t-h\tPrints this message.\n\n");
 
         puts("Examples:");
