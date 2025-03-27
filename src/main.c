@@ -25,26 +25,26 @@
 uint16_t GRID = 30;
 
 struct Config {
-	SDL_Window* 	  window;
+	SDL_Window* 	window;
 	SDL_Renderer* 	renderer;
-	SDL_Event	      event;
-  SDL_Texture*    tex;
-	bool		        running;
+	SDL_Event	event;
+  	SDL_Texture*  	tex;
+	bool		running;
 
-	vector_t*	      b1;
-	vector_t*	      b2;
-  char*           bstr;
-	bool		        verbose;
+	vector_t*	b1;
+	vector_t* 	b2;
+ 	char*           bstr;
+	bool		verbose;
 
-	bool		        fundamental_domain;
-	bool		        reduce;
-	bool		        show_points;
-  bool            cvp;
-  vector_t        cvp_coords;
+	bool		fundamental_domain;
+	bool		reduce;
+	bool		show_points;
+  	bool            cvp;
+  	vector_t        cvp_coords;
 
-	vector_t*	      precomp_points;
-  float           zoom;
-  vector_t        origin;
+	vector_t*	precomp_points;
+  	float           zoom;
+  	vector_t        origin;
 };
 
 bool init_sdl(struct Config *c, bool verbose);
@@ -104,56 +104,57 @@ void sdl_events(struct Config *c) {
 				switch (c->event.key.scancode) {
 					case SDL_SCANCODE_ESCAPE:
 						c->running = false;
-						break;
+					break;
 
 					case SDL_SCANCODE_F:
 						c->fundamental_domain = !(c->fundamental_domain);
-						break;
+					break;
 
-          case SDL_SCANCODE_R:
-            lagrange_reduction(c->b1, c->b2);
-            if (c->verbose) {
-                printf("[INFO] Lagrange reduction yielded b1 = (%Lf, %Lf), b2 = (%Lf, %Lf).\n",
-                       c->b1->e1, c->b1->e2, c->b2->e1, c->b2->e2);
-            }
+				          case SDL_SCANCODE_R:
+				            lagrange_reduction(c->b1, c->b2);
+				            if (c->verbose) {
+				                printf("[INFO] Lagrange reduction yielded b1 = (%Lf, %Lf), b2 = (%Lf, %Lf).\n",
+				                       c->b1->e1, c->b1->e2, c->b2->e1, c->b2->e2);
+				            }
+				
+				            c->reduce = true;
+				            int half_grid = GRID / 2;
+				            uint32_t ctr = 0;
+				            for (int i = -half_grid; i < half_grid; i++) {
+				                for (int j = -half_grid; j < half_grid; j++) {
+				                    vector_t vt = vector_vadd(vector_smul(i, *(c->b1)), vector_smul(j, *(c->b2)));
+				                    c->precomp_points[ctr] = sdl_origin_translation(&vt, c->zoom);
+				                    ctr++;
+				                }
+				            }
 
-            c->reduce = true;
-            int half_grid = GRID / 2;
-            uint32_t ctr = 0;
-            for (int i = -half_grid; i < half_grid; i++) {
-                for (int j = -half_grid; j < half_grid; j++) {
-                    vector_t vt = vector_vadd(vector_smul(i, *(c->b1)), vector_smul(j, *(c->b2)));
-                    c->precomp_points[ctr] = sdl_origin_translation(&vt, c->zoom);
-                    ctr++;
-                }
-            }
-
-            c->tex = sdl_render_points(c);
-            SDL_RenderTexture(c->renderer, c->tex, NULL, NULL);
-            break;
+				            c->tex = sdl_render_points(c);
+				            SDL_RenderTexture(c->renderer, c->tex, NULL, NULL);
+				            break;
+					
 					case SDL_SCANCODE_H:
 						c->show_points = !(c->show_points);
-						break;
+					break;
           
-          case SDL_SCANCODE_C:
-              float x = 0.0f;
-              float y = 0.0f;
-              SDL_GetMouseState(&x, &y);
-              
-              vector_t t = {(x - WIDTH/2) / c->zoom, -(y - HEIGHT/2) / c->zoom};
-              vector_t cvp_vector = babai2_cvp(*c->b1, *c->b2, t);
-              
-              c->cvp_coords = sdl_origin_translation(&cvp_vector, c->zoom); // fix this if you can!
-              c->cvp = true;
-            break;
+				  case SDL_SCANCODE_C:
+				      float x = 0.0f;
+				      float y = 0.0f;
+				      SDL_GetMouseState(&x, &y);
+				      
+				      vector_t t = {(x - WIDTH/2) / c->zoom, -(y - HEIGHT/2) / c->zoom};
+				      vector_t cvp_vector = babai2_cvp(*c->b1, *c->b2, t);
+				      
+				      c->cvp_coords = sdl_origin_translation(&cvp_vector, c->zoom); // fix this if you can!
+				      c->cvp = true;
+				      break;
 
 					default:
-						break;
+					break;
 				}
 				break;
 
 			default:
-				break;
+			break;
 		}
 	}
 }
@@ -206,7 +207,7 @@ void sdl_draw(struct Config *c) {
   }
 
   if (c->cvp) {
-    aacircleRGBA(c->renderer, c->cvp_coords.e1, c->cvp_coords.e2, 10, 0, 0, 200, 255); // major translation issues. i don't know why this happens.
+    aacircleRGBA(c->renderer, c->cvp_coords.e1, c->cvp_coords.e2, 10, 0, 0, 200, 255);
   }
 
 	SDL_RenderPresent(c->renderer);
@@ -298,7 +299,7 @@ int main(int argc, char* argv[]) {
         puts("See README.md for keyboard controls inside the application.");
         exit(0);
         break;
-			default:
+	default:
 use_err:
 				fprintf(stderr,
             "Usage: %s [-vh] <-b BASIS> [-z ZOOM] [-c COUNT]\nType %s -h for help.\n", argv[0], argv[0]);
@@ -308,14 +309,14 @@ use_err:
 	}
 
 	if (str_basis == NULL || strcount(str_basis, ',') != 3) { goto use_err; }
-  char* token = strtok(str_basis, ",");
+  	char* token = strtok(str_basis, ",");
 	for (uint8_t i = 0; i < 4; i++) {
 		basis[i / 2][i & 1] = strtold(token, NULL);
 		token = strtok(NULL, ",");
 	}
 	vector_t b1 = vector_init(basis[0][0], basis[0][1]);
 	vector_t b2 = vector_init(basis[1][0], basis[1][1]);
-  char** vector_string = string_to_vectorf(basis[0][0], basis[0][1], basis[1][0], basis[1][1]);
+  	char** vector_string = string_to_vectorf(basis[0][0], basis[0][1], basis[1][0], basis[1][1]);
 
 	if (verbose) {
 		printf("[INFO] Basis vectors set b1 = (%Lf, %Lf), b2 = (%Lf, %Lf).\n", b1.e1, b1.e2, b2.e1, b2.e2);
@@ -334,7 +335,7 @@ use_err:
 
 	c.b1 = &b1;
 	c.b2 = &b2;
-  c.zoom = zoom ? zoom : 1;
+  	c.zoom = zoom ? zoom : 1;
 
 	vector_t* points = malloc(sizeof(vector_t) * (GRID*GRID));
 	if (points == NULL) { 
@@ -356,9 +357,9 @@ use_err:
   
 	c.verbose = verbose;
 
-  c.origin = sdl_origin_translation(&(vector_t){0, 0}, c.zoom);
+  	c.origin = sdl_origin_translation(&(vector_t){0, 0}, c.zoom);
 
-  c.tex = sdl_render_points(&c);
+  	c.tex = sdl_render_points(&c);
 
 	sdl_run(&c);
 
